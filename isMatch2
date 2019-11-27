@@ -1,0 +1,94 @@
+#coding: utf-8
+import unittest
+"""
+字符串匹配，字符串s，字符模式p。
+‘*’：任意字符串
+‘？’：单个字符
+"""
+class Solution:
+    def isMatch(self, s, p):
+        """
+        :param s:目标字符串s,str
+        :param p:模式字符串,str
+        :return:是否匹配，bool
+        """
+        #si,pi为s,p当前比较位置；sj,pj记录遇到*时，s和p各自位置
+        si, pi, sj, pj = 0, 0, -1, -1
+        while si<len(s):
+            if pi < len(p) and p[pi] == '*':
+                pi += 1
+                pj = pi #pj只记录最新遇到*的位置，因为*abc*可以用*代替
+                sj = si #记录遇到*时s的位置
+            elif pi < len(p) and (p[pi]=='?' or p[pi]==s[si]):#遇到?或匹配时，同时向后移动
+                si += 1
+                pi += 1
+            elif pj!=-1:#发生不匹配且之前遇到过*时，*再往后匹配一位
+                pi = pj #回到最后一个*所在位置
+                sj += 1
+                si = sj
+            else:
+                return False
+
+        while(pi<len(p) and p[pi]=='*'):#si==len(s)，而pi<len(p)时，只有*能取空，pi向后走
+            pi += 1
+
+        return pi == len(p)
+
+class TestSolution(unittest.TestCase):
+    #出现空的情况
+    def test_empty(self):
+        solve = Solution()
+        s = ""
+        p = ""
+        self.assertEqual(solve.isMatch(s, p), True)
+
+        s = ""
+        p = "*"
+        self.assertEqual(solve.isMatch(s, p), True)
+
+        s = "a"
+        p = ""
+        self.assertEqual(solve.isMatch(s, p), False)
+
+        s = ""
+        p = "?"
+        self.assertEqual(solve.isMatch(s, p), False)
+    #出现*的情况
+    def test_star(self):
+        solve = Solution()
+        s = "abac"
+        p = "*"
+        self.assertEqual(solve.isMatch(s, p), True)
+
+        s = "abac"
+        p = "*b"
+        self.assertEqual(solve.isMatch(s, p), False)
+
+        s = "abac"
+        p = "b*"
+        self.assertEqual(solve.isMatch(s, p), False)
+
+        s = "abac"
+        p = "a*"
+        self.assertEqual(solve.isMatch(s, p), True)
+    #出现？或（？和*）的情况
+    def test_star_que(self):
+        solve = Solution()
+        s = "abac"
+        p = "a?ac"
+        self.assertEqual(solve.isMatch(s, p), True)
+
+        s = "abac"
+        p = "a?c"
+        self.assertEqual(solve.isMatch(s, p), False)
+
+        s = "abac"
+        p = "?*"
+        self.assertEqual(solve.isMatch(s, p), True)
+
+        s = "abac"
+        p = "b?*"
+        self.assertEqual(solve.isMatch(s, p), False)
+
+if __name__=="__main__":
+    unittest.main()
