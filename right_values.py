@@ -1,3 +1,6 @@
+"""
+return a tree's right-hand-most nodes in every level.
+"""
 import unittest
 
 class TreeNode(object):
